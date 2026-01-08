@@ -38,11 +38,11 @@ class vec3 {
 			return *this *= 1/t;
 		}
 
-		double lentght() const {
-			return std::sqrt(lenght_squared());
+		double length() const {
+			return std::sqrt(length_squared());
 		}
 
-		double lenght_squared() const {
+		double length_squared() const {
 			return e[0]* e[0] + e[1] * e[1] + e[2] * e[2];
 		}
 };
@@ -90,7 +90,7 @@ inline vec3 cross(const vec3& u, const vec3& v) {
 }
 
 inline vec3 unit_vector(const vec3& v) {
-	return v / v.lentght();
+	return v / v.length();
 }
 
 //todo: move methods to cpp; create an abstraction to define point3 and color that inherits from vec3;
