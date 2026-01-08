@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include <limits>
 
 #include "color.h"
 #include "ray.h"
@@ -8,12 +7,13 @@
 #include "hittable.h"
 #include "hittable_list.h"
 #include "sphere.h"
+#include "interval.h"
 
-const double infinity = std::numeric_limits<double>::infinity();
 
 color ray_color(const ray& r, const hittable& world) {
 	hit_record rec;
-	if (world.hit(r, 0, infinity, rec)) {
+	if (world.hit(r, interval(0, interval::infinity), rec)) {
+
 		//return color(0.5, 1, 0.3);
 		return 0.5 * (rec.normal + color(1, 1, 1));
 	}
