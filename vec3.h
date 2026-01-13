@@ -110,7 +110,7 @@ inline vec3 unit_vector(const vec3& v) {
 	return v / v.length();
 }
 
-inline vec3 random_unit_vector(const vec3& v) { //todo: make this method less brute force
+inline vec3 random_unit_vector() { //todo: make this method less brute force
 	while(true) {
 		auto p = vec3::random(-1, 1);
 		auto lensq = p.length_squared();
@@ -118,6 +118,14 @@ inline vec3 random_unit_vector(const vec3& v) { //todo: make this method less br
 			return p / sqrt(lensq);
 		}
 	}
+}
+
+inline vec3 random_on_hemisphere(const vec3 normal) {
+	vec3 on_unit_sphere = random_unit_vector();
+	if(dot(on_unit_sphere, normal) > 0.0)
+		return on_unit_sphere;
+	else
+		return -on_unit_sphere;
 }
 
 //todo: move methods to cpp; create an abstraction to define point3 and color that inherits from vec3;
