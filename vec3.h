@@ -110,6 +110,16 @@ inline vec3 unit_vector(const vec3& v) {
 	return v / v.length();
 }
 
+inline vec3 random_unit_vector(const vec3& v) { //todo: make this method less brute force
+	while(true) {
+		auto p = vec3::random(-1, 1);
+		auto lensq = p.length_squared();
+		if (1e-160 < lensq && lensq <= 1) {
+			return p / sqrt(lensq);
+		}
+	}
+}
+
 //todo: move methods to cpp; create an abstraction to define point3 and color that inherits from vec3;
 
 #endif
