@@ -1,12 +1,29 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "hittable.h"
+#include <vector>
+
 #include "vec3.h"
 #include "color.h"
 #include "ray.h"
 #include "interval.h"
 #include "utils.h"
+#include "sphere.h"
+
+class hit_record {
+public:
+	point3 p;
+	vec3 normal;
+	double t;
+	bool front_face;
+
+	void set_face_normal(const ray& r, const vec3& outward_normal) {
+		//assumes outward_normal to bo a unit vector
+
+		front_face = dot(r.direction(), outward_normal) < 0;
+		normal = front_face ? outward_normal : -outward_normal;
+	}
+};
 
 class camera  {
 public:
@@ -16,7 +33,7 @@ public:
 	int samples_per_pixel = 10;	
 	int max_depth = 10;
 
-	void render(const hittable& world) {
+	void render(const std::vector<sphere>& world) {
 		initialize();
 
 		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
@@ -45,6 +62,7 @@ private:
 	vec3 pixel_delta_u;
 	vec3 pixel_delta_v;
 	double pixel_samples_scale; //color scale factor for a sum of pixel samples
+	
 
 	void initialize() {
 		image_height = int(image_width / aspect_ratio);
@@ -88,13 +106,13 @@ private:
 		return vec3(utils::random_double() - 0.5, utils::random_double() - 0.5, 0);
 	}
 
-	color ray_color(const ray& r, int depth, const hittable& world) const {
+	color ray_color(const ray& r, int depth, const std::vector<sphere>& world) const {
 
 		if (depth <= 0)
 			return color(0, 0, 0);
 
 		hit_record rec;
-		if (world.hit(r, interval(0.001, interval::infinity), rec)) {
+		if (scene_hit(world, r, interval(0.001, interval::infinity), rec)) {
 			vec3 direction = rec.normal + random_unit_vector(); 
 			//actually an aproximation to a cossine weighted distribution
 			
@@ -106,6 +124,50 @@ private:
 		auto b = 0.5 * (unit_direction.x() + 1.0);
 		color c = (1.0 - b) * color(1, 0.984, 0) + b * color(0.5, 0.7, 1.0);
 		return 	(1.0 - a) * color(1.0, 1.0, 1.0) + a * c;
+	}
+
+	
+	bool sphere_hit(const sphere& sphere, const ray& r, interval ray_t, hit_record& rec) const{
+		vec3 oc = sphere.center - r.origin();
+		auto a = r.direction().length_squared();
+		auto h = dot(r.direction(), oc);
+		auto c = dot(oc, oc) - sphere.radius * sphere.radius;
+		auto discriminant = h*h - (a * c);
+
+		if (discriminant < 0)
+			return false;	
+
+		auto sqrtd = std::sqrt(discriminant);
+
+		auto root = (h - sqrtd) / a;
+		if (!ray_t.surrounds(root)) {
+			root = (h + sqrtd) / a;
+			if (!ray_t.surrounds(root)) {
+				return false;
+			}
+		}
+
+		rec.t = root;
+		rec.p = r.at(rec.t);
+		vec3 outward_normal = (rec.p - sphere.center) / sphere.radius;
+		rec.set_face_normal(r, outward_normal);
+
+		return true;
+	}	
+
+	bool scene_hit(const std::vector<sphere>& spheres, const ray& r, interval ray_t, hit_record& rec) const {
+		hit_record temp_rec;
+		bool hit_anything = false;
+		auto closest_so_far = ray_t.max;
+
+		for (const auto& sphere : spheres) {
+			if (sphere_hit(sphere, r, interval(ray_t.min, closest_so_far), temp_rec)) {
+				hit_anything = true;
+				closest_so_far = temp_rec.t;
+				rec = temp_rec;
+			}	
+		}
+		return hit_anything;
 	}
 };
 
