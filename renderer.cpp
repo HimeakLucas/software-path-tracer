@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -28,21 +29,31 @@ void Renderer::render(const scene& scene, const camera& camera) {
 
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
-	if (depth <= 0)
-		return color(0, 0, 0);
+	vec3 albedo(0.686, 0.239, 0.851);
+	vec3 ray_color(1, 1, 1);
+	ray bouncing_ray = r;
 
-	hit_record rec = closest_hit(scene, r);
-	if (rec.hit_something) {
-		vec3 bounce_direction = rec.normal + random_unit_vector();
-		ray bounce_ray(rec.hit_point, bounce_direction);
-		return 0.5 * trace_ray(scene, bounce_ray, depth - 1);
+
+	for(int i = 0; i <= depth; i++) {
+		hit_record rec = closest_hit(scene, bouncing_ray);
+		if(rec.hit_something) {
+			vec3 bounce_direction = rec.normal + random_unit_vector();
+			bouncing_ray.dir = bounce_direction;
+			bouncing_ray.orig = rec.hit_point;
+			ray_color *= albedo; //component wise multiplication;
+		}
+		else {
+			vec3 unit_direction = unit_vector(bouncing_ray.direction());
+			auto a = 0.5 * (unit_direction.y() + 1.0);
+			color sky_color = (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); 
+			return ray_color * sky_color;
+		}
 	}
 
-	vec3 unit_direction = unit_vector(r.direction());
-	auto a = 0.5 * (unit_direction.y() + 1.0);
-	return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); 
-	//TODO: create a method to return sky color;
+	return color(0, 0, 0);
 }
+
+
 
 
 Renderer::hit_record Renderer::closest_hit(const scene& scene, const ray& r) {
