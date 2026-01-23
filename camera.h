@@ -1,12 +1,14 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "hittable.h"
+#include <vector>
+
 #include "vec3.h"
 #include "color.h"
 #include "ray.h"
 #include "interval.h"
 #include "utils.h"
+#include "scene.h"
 
 class camera  {
 public:
@@ -14,36 +16,20 @@ public:
 	double aspect_ratio= 1.0;
 	int image_width = 100; 
 	int samples_per_pixel = 10;	
-
-	void render(const hittable& world) {
-		initialize();
-
-		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
-
-		for (int j = 0; j < image_height; j++) {
-			std::clog << "\rScanLines remaining: " << (image_height - j) << ' ' << std::flush;
-			for (int i = 0; i < image_width; i++) {
-				color pixel_color(0, 0, 0);
-
-				for (int sample = 0; sample < samples_per_pixel; sample++) {
-					ray r = get_ray(i, j);
-					pixel_color += ray_color(r , world);
-				}
-
-				write_color(std::cout, pixel_samples_scale * pixel_color);
-			}
-		}
-
-		std::clog << "\rDone.                                \n";
-	}
-
-private:
+	int max_depth = 10;
 	int image_height;
-	point3 center;
-	point3 pixel_00_loc;
-	vec3 pixel_delta_u;
-	vec3 pixel_delta_v;
-	double pixel_samples_scale; //color scale factor for a sum of pixel samples
+
+	ray get_ray(int i, int j) const {
+		auto offset = sample_square();
+		auto pixel_sample = pixel_00_loc
+				+ ((i + offset.x()) * pixel_delta_u)
+				+ ((j + offset.y()) * pixel_delta_v);
+
+		auto ray_origin = center;
+		auto ray_direction = pixel_sample - ray_origin;
+
+		return ray(ray_origin, ray_direction);
+	}
 
 	void initialize() {
 		image_height = int(image_width / aspect_ratio);
@@ -71,32 +57,19 @@ private:
 		 pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 	}
 
-	ray get_ray(int i, int j) const {
-		auto offset = sample_square();
-		auto pixel_sample = pixel_00_loc
-				+ ((i + offset.x()) * pixel_delta_u)
-				+ ((j + offset.y()) * pixel_delta_v);
 
-		auto ray_origin = center;
-		auto ray_direction = pixel_sample - ray_origin;
 
-		return ray(ray_origin, ray_direction);
-	}
+private:
+	point3 center;
+	point3 pixel_00_loc;
+	vec3 pixel_delta_u;
+	vec3 pixel_delta_v;
+	double pixel_samples_scale; //color scale factor for a sum of pixel samples
 
 	vec3 sample_square() const {
 		return vec3(utils::random_double() - 0.5, utils::random_double() - 0.5, 0);
 	}
 
-	color ray_color(const ray& r, const hittable& world) const {
-		hit_record rec;
-		if (world.hit(r, interval(0, interval::infinity), rec)) {
-			return 0.5 * (rec.normal + color(1, 1, 1));
-		}
-
-		vec3 unit_direction = unit_vector(r.direction());
-		auto a = 0.5 * (unit_direction.y() + 1.0);
-		return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
-	}
 };
 
 #endif
