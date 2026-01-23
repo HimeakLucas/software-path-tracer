@@ -4,3 +4,7 @@ build
 *.perf
 *.data
 *.xcf
+build-release
+build-debug
+build-profile
+build-perf
