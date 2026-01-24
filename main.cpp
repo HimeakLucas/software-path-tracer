@@ -9,6 +9,15 @@ int main() {
 	sphere ball(point3(0, 0, -1), 0.5);
 	sphere earth(point3(0, -100.5, -1), 100);
 
+	material mat1;
+	mat1.albedo = vec3(0.5, 0.7, 0.9);
+
+	material mat2;
+	mat1.albedo = vec3(0.1, 0.9, 0.4);
+
+	ball.mat = mat1;
+	earth.mat = mat2;
+
 	scene world;
 	world.spheres.push_back(ball);
 	world.spheres.push_back(earth);

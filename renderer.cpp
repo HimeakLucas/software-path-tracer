@@ -29,7 +29,6 @@ void Renderer::render(const scene& scene, const camera& camera) {
 
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
-	vec3 albedo(0.686, 0.239, 0.851);
 	vec3 ray_color(1, 1, 1);
 	ray bouncing_ray = r;
 
@@ -40,7 +39,7 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 			vec3 bounce_direction = rec.normal + random_unit_vector();
 			bouncing_ray.dir = bounce_direction;
 			bouncing_ray.orig = rec.hit_point;
-			ray_color *= albedo; //component wise multiplication;
+			ray_color *= rec.mat.albedo; //component wise multiplication;
 		}
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
@@ -103,6 +102,7 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 	rec.hit_something = true;
 	rec.distance = root;
 	rec.hit_point = r.at(rec.distance);
+	rec.mat = sphere.mat;
 
 	vec3 outward_normal = (rec.hit_point - sphere.center) / sphere.radius;
 	rec.set_face_normal(r, outward_normal);
