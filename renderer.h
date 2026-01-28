@@ -15,6 +15,7 @@ private:
 		vec3 normal;
 		double distance;
 		bool hit_from_outside = true;
+		material mat;
 
 		void set_face_normal(const ray& r, const vec3& outward_normal) {
 			//assumes outward_normal to be a unit vector

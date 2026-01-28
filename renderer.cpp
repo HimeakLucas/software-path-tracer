@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "utils.h"
 #include "vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
@@ -29,7 +30,6 @@ void Renderer::render(const scene& scene, const camera& camera) {
 
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
-	vec3 albedo(0.686, 0.239, 0.851);
 	vec3 ray_color(1, 1, 1);
 	ray bouncing_ray = r;
 
@@ -37,15 +37,23 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 	for(int i = 0; i <= depth; i++) {
 		hit_record rec = closest_hit(scene, bouncing_ray);
 		if(rec.hit_something) {
-			vec3 bounce_direction = rec.normal + random_unit_vector();
+
+			material material = rec.mat;
+
+			bool is_specular_bounce = material.specular_probability >= utils::random_double();
+
+			vec3 diffuse_direction = rec.normal + random_unit_vector();
+			vec3 specular_direction = reflect(bouncing_ray.direction(), rec.normal);
+			vec3 bounce_direction = lerp(material.smoothness * is_specular_bounce, specular_direction, diffuse_direction);
+
 			bouncing_ray.dir = bounce_direction;
 			bouncing_ray.orig = rec.hit_point;
-			ray_color *= albedo; //component wise multiplication;
+			ray_color *= rec.mat.albedo; //component wise multiplication;
 		}
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
 			auto a = 0.5 * (unit_direction.y() + 1.0);
-			color sky_color = (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); 
+			color sky_color = lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
 			return ray_color * sky_color;
 		}
 	}
@@ -103,6 +111,7 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 	rec.hit_something = true;
 	rec.distance = root;
 	rec.hit_point = r.at(rec.distance);
+	rec.mat = sphere.mat;
 
 	vec3 outward_normal = (rec.hit_point - sphere.center) / sphere.radius;
 	rec.set_face_normal(r, outward_normal);
