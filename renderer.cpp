@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "utils.h"
 #include "vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
@@ -36,7 +37,15 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 	for(int i = 0; i <= depth; i++) {
 		hit_record rec = closest_hit(scene, bouncing_ray);
 		if(rec.hit_something) {
-			vec3 bounce_direction = rec.normal + random_unit_vector();
+
+			material material = rec.mat;
+
+			bool is_specular_bounce = material.specular_probability >= utils::random_double();
+
+			vec3 diffuse_direction = rec.normal + random_unit_vector();
+			vec3 specular_direction = reflect(bouncing_ray.direction(), rec.normal);
+			vec3 bounce_direction = lerp(material.smoothness * is_specular_bounce, specular_direction, diffuse_direction);
+
 			bouncing_ray.dir = bounce_direction;
 			bouncing_ray.orig = rec.hit_point;
 			ray_color *= rec.mat.albedo; //component wise multiplication;
@@ -44,7 +53,7 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
 			auto a = 0.5 * (unit_direction.y() + 1.0);
-			color sky_color = (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); 
+			color sky_color = lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
 			return ray_color * sky_color;
 		}
 	}

@@ -119,7 +119,7 @@ inline vec3 unit_vector(const vec3& v) {
 
 inline vec3 random_unit_vector() { //todo: make this method less brute force
 	while(true) {
-		auto p = vec3::random(-1, 1);
+		auto p = vec3::random(-0.5, 0.5);
 		auto lensq = p.length_squared();
 		if (1e-160 < lensq && lensq <= 1) {
 			return p / sqrt(lensq);
@@ -133,6 +133,14 @@ inline vec3 random_on_hemisphere(const vec3 normal) {
 		return on_unit_sphere;
 	else
 		return -on_unit_sphere;
+}
+
+inline vec3 reflect(const vec3& v, const vec3& normal) {
+	return v - (2 * normal * dot(v, normal));
+}
+
+inline vec3 lerp(const float& a, const vec3& start, const vec3& end) {
+	return (1 - a) * end + a * start;
 }
 
 //todo: move methods to cpp; create an abstraction to define point3 and color that inherits from vec3;
