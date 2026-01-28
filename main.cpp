@@ -16,15 +16,15 @@ int main() {
 	sphere ball2(point3(-1, 0, -1), 0.5);
 	material mat2;
 	mat2.albedo = vec3(0.8, 0.6, 0.2);
-	mat2.smoothness = 0.9;
-	mat2.specular_probability = 0.5;
+	mat2.emission_color = vec3(0.8, 0.6, 0.2);
+	mat2.emission_strength = 1.0;
 	ball2.mat = mat2;
 
 	sphere ball3(point3(1 , 0, -1), 0.5);
 	material mat3;
 	mat3.albedo = vec3(0.3, 0.8, 0.2);
-	mat3.smoothness = 0.98;
-	mat3.specular_probability = 1.96;
+	mat3.smoothness = 0.95;
+	mat3.specular_probability = 0.95;
 	ball3.mat = mat3;
 
 	sphere earth(point3(0, -100.5, -1), 100);

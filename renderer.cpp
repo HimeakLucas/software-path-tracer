@@ -31,7 +31,9 @@ void Renderer::render(const scene& scene, const camera& camera) {
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
 	vec3 ray_color(1, 1, 1);
+	vec3 incoming_light(0, 0, 0);
 	ray bouncing_ray = r;
+	float ambient_light = 0.04;
 
 
 	for(int i = 0; i <= depth; i++) {
@@ -48,17 +50,21 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
 			bouncing_ray.dir = bounce_direction;
 			bouncing_ray.orig = rec.hit_point;
+
+			vec3 emitted_light = material.emission_color * material.emission_strength;
+			incoming_light += emitted_light * ray_color;
 			ray_color *= rec.mat.albedo; //component wise multiplication;
 		}
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
 			auto a = 0.5 * (unit_direction.y() + 1.0);
-			color sky_color = lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
-			return ray_color * sky_color;
+			color sky_color = ambient_light * lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
+			incoming_light += sky_color * ray_color;
+			return incoming_light;
 		}
 	}
 
-	return color(0, 0, 0);
+	return incoming_light;
 }
 
 

@@ -6,8 +6,11 @@
 struct material {
 public:
 	vec3 albedo{0.5, 0.5, 0.5};
-	float smoothness;
-	float specular_probability;
+	vec3 emission_color{0, 0, 0};
+	float smoothness = 0;
+	float specular_probability = 0;
+	float emission_strength = 0;
+
 };
 
 struct sphere{
