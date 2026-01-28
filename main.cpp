@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "renderer.h"
 #include <vector>
+#include "benchmark.h"
 
 int main() {
 
@@ -43,13 +44,17 @@ int main() {
 	camera cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 1920;
-	cam.samples_per_pixel = 2000;
+	cam.image_width = 400;
+	cam.samples_per_pixel = 500;
 	cam.max_depth = 50;
 	cam.initialize();
 
-
+	
 	Renderer render;
-	render.render(world, cam);
+
+	{
+		Timer timer(TimeUnit::Seconds);
+		render.render(world, cam);
+	}
 	
 }
