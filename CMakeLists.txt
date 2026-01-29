@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 option(ENABLE_PERF "Build with flags useful for perf (ReleaseWithDebInfo + frame pointers)" OFF)
 
-add_executable(path_tracer main.cpp renderer.cpp)
+add_executable(path_tracer main.cpp src/renderer.cpp)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)

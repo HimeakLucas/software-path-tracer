@@ -1,9 +1,9 @@
-#include "vec3.h"
-#include "scene.h"
-#include "camera.h"
-#include "renderer.h"
+#include "src/vec3.h"
+#include "src/scene.h"
+#include "src/camera.h"
+#include "src/renderer.h"
 #include <vector>
-#include "benchmark.h"
+#include "src/benchmark.h"
 
 int main() {
 
