@@ -1,9 +1,9 @@
-#include "src/vec3.h"
-#include "src/scene.h"
-#include "src/camera.h"
-#include "src/renderer.h"
+#include "path_tracer/vec3.h"
+#include "path_tracer/scene.h"
+#include "path_tracer/camera.h"
+#include "path_tracer/renderer.h"
 #include <vector>
-#include "src/benchmark.h"
+#include "path_tracer/benchmark.h"
 
 int main() {
 

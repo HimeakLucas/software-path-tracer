@@ -1,6 +1,6 @@
-#include "renderer.h"
-#include "utils.h"
-#include "vec3.h"
+#include "path_tracer/renderer.h"
+#include "path_tracer/utils.h"
+#include "path_tracer/vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
