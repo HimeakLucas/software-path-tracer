@@ -8,3 +8,4 @@ build-release
 build-debug
 build-profile
 build-perf
+.cache
