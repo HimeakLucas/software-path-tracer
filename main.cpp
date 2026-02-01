@@ -4,42 +4,77 @@
 #include "path_tracer/renderer.h"
 #include <vector>
 #include "path_tracer/benchmark.h"
+#include "yaml-cpp/node/parse.h"
+#include "yaml-cpp/yaml.h"
+
+//https://github.com/jbeder/yaml-cpp/wiki/Tutorial
+namespace YAML {
+template<>
+struct convert<vec3>{
+	static Node encode(const vec3& rhs) {
+		Node node;
+		node.push_back(rhs.x());
+		node.push_back(rhs.y());
+		node.push_back(rhs.z());
+
+		return node;	
+	}
+	
+	static bool decode(const Node& node, vec3& rhs) {
+		if(!node.IsSequence() || node.size() != 3) {
+			return false;
+		}
+
+		rhs.e[0] = node[0].as<double>();
+		rhs.e[1] = node[1].as<double>();
+		rhs.e[2] = node[2].as<double>();
+		return true;
+	} 
+};
+
+}
 
 int main() {
 
-	sphere ball1(point3(0 , 0, -1.3), 0.5);
-	material mat1;
-	mat1.albedo = vec3(0.1, 0.2, 0.5);
-	mat1.smoothness = 0.0;
-	mat1.specular_probability = 0.0;
-	ball1.mat = mat1;
+	YAML::Node scene_file = YAML::LoadFile("demos/scene1.yaml");
 
-	sphere ball2(point3(-1, 0, -1), 0.5);
-	material mat2;
-	mat2.albedo = vec3(0.8, 0.6, 0.2);
-	mat2.emission_color = vec3(0.8, 0.6, 0.2);
-	mat2.emission_strength = 1.0;
-	ball2.mat = mat2;
+	std::map<std::string ,material> material_lib;
+	auto materials_node = scene_file["materials"];
 
-	sphere ball3(point3(1 , 0, -1), 0.5);
-	material mat3;
-	mat3.albedo = vec3(0.3, 0.8, 0.2);
-	mat3.smoothness = 0.95;
-	mat3.specular_probability = 0.95;
-	ball3.mat = mat3;
+	if (materials_node) {
+		for (auto it = materials_node.begin(); it != materials_node.end(); it++) {
+			std::string name = it->first.as<std::string>();
+			YAML::Node data = it->second;
+			
+			material mat;
+			mat.albedo = data["albedo"].as<vec3>();
+			mat.smoothness = data["smoothness"].as<double>();
+			mat.specular_probability = data["specular_probability"].as<double>();
 
-	sphere earth(point3(0, -100.5, -1), 100);
-	material mat4;
-	mat4.albedo = vec3(0.8, 0.7, 0.9);
-	mat4.smoothness = 0.0;
-	mat4.specular_probability = 0.0;
-	earth.mat = mat4;
+			material_lib[name] = mat;
+		}
+	}
 
 	scene world;
-	world.spheres.push_back(ball1);
-	world.spheres.push_back(ball2);
-	world.spheres.push_back(ball3);
-	world.spheres.push_back(earth);
+	auto world_node = scene_file["world"];
+
+	point3 center = world_node[0]["center"].as<vec3>();
+	double radius = world_node[0]["radius"].as<double>();
+
+	material mat;
+	auto mat_name = world_node[0]["material"].as<std::string>();
+	mat = material_lib[mat_name];
+
+	world.spheres.push_back(sphere(center, radius, mat));
+
+	// if (world_node && world_node.IsSequence()) {
+	// 	for (auto item : world_node) {
+	// 		if (item["type"].as<std::string>() == "sphere") {
+	// 			point3 center = item["center"].as<vec3>();
+	// 			double radius
+	// 		}
+	// 	}
+	// }
 
 	camera cam;
 

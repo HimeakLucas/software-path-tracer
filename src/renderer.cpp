@@ -33,7 +33,7 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 	vec3 ray_color(1, 1, 1);
 	vec3 incoming_light(0, 0, 0);
 	ray bouncing_ray = r;
-	float ambient_light = 0.04;
+	float ambient_light = 1.00;
 
 
 	for(int i = 0; i <= depth; i++) {

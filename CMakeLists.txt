@@ -7,6 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 option(ENABLE_PERF "Build with flags useful for perf (ReleaseWithDebInfo + frame pointers)" OFF)
 
 
+include(FetchContent)
+
+FetchContent_Declare(
+	yaml-cpp
+	GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+	#TODO: tag a specific version o yaml-cpp. Currently on master
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
+
+
 add_executable(path_tracer
 	${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/renderer.cpp
@@ -15,6 +26,8 @@ add_executable(path_tracer
 target_include_directories(path_tracer PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+target_link_libraries(path_tracer PRIVATE yaml-cpp::yaml-cpp)
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)

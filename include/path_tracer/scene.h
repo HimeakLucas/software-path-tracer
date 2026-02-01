@@ -15,7 +15,7 @@ public:
 
 struct sphere{
 
-	sphere(point3 c, double r) : center(c), radius(r) {}
+	sphere(point3 c, double r, material m) : center(c), radius(r), mat(m) {}
 	point3 center;
 	double radius;
 	material mat;
