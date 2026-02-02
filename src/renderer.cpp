@@ -33,8 +33,7 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 	vec3 ray_color(1, 1, 1);
 	vec3 incoming_light(0, 0, 0);
 	ray bouncing_ray = r;
-	float ambient_light = 1.00;
-
+	double ambient_light_strength = scene.ambient_light_strength;
 
 	for(int i = 0; i <= depth; i++) {
 		hit_record rec = closest_hit(scene, bouncing_ray);
@@ -58,7 +57,7 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
 			auto a = 0.5 * (unit_direction.y() + 1.0);
-			color sky_color = ambient_light * lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
+			color sky_color = ambient_light_strength * lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
 			incoming_light += sky_color * ray_color;
 			return incoming_light;
 		}

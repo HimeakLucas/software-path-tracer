@@ -6,33 +6,7 @@
 #include "path_tracer/benchmark.h"
 #include "yaml-cpp/node/parse.h"
 #include "yaml-cpp/yaml.h"
-
-//https://github.com/jbeder/yaml-cpp/wiki/Tutorial
-namespace YAML {
-template<>
-struct convert<vec3>{
-	static Node encode(const vec3& rhs) {
-		Node node;
-		node.push_back(rhs.x());
-		node.push_back(rhs.y());
-		node.push_back(rhs.z());
-
-		return node;	
-	}
-	
-	static bool decode(const Node& node, vec3& rhs) {
-		if(!node.IsSequence() || node.size() != 3) {
-			return false;
-		}
-
-		rhs.e[0] = node[0].as<double>();
-		rhs.e[1] = node[1].as<double>();
-		rhs.e[2] = node[2].as<double>();
-		return true;
-	} 
-};
-
-}
+#include "path_tracer/yaml_parser.h"
 
 int main() {
 
@@ -51,36 +25,36 @@ int main() {
 			mat.smoothness = data["smoothness"].as<double>();
 			mat.specular_probability = data["specular_probability"].as<double>();
 
+			if (data["emission_strength"]) {
+				mat.emission_strength = data["emission_strength"].as<double>();
+				mat.emission_color = data["emission_color"].as<vec3>();
+			}
+
 			material_lib[name] = mat;
 		}
 	}
 
 	scene world;
 	auto world_node = scene_file["world"];
+	world.ambient_light_strength = scene_file["ambient_light_strength"].as<double>();
 
-	point3 center = world_node[0]["center"].as<vec3>();
-	double radius = world_node[0]["radius"].as<double>();
 
-	material mat;
-	auto mat_name = world_node[0]["material"].as<std::string>();
-	mat = material_lib[mat_name];
+	for (auto object: world_node) {
+		point3 center = object["center"].as<vec3>();
+		double radius = object["radius"].as<double>();
 
-	world.spheres.push_back(sphere(center, radius, mat));
+		material mat;
+		auto mat_name = object["material"].as<std::string>();
+		mat = material_lib[mat_name];
 
-	// if (world_node && world_node.IsSequence()) {
-	// 	for (auto item : world_node) {
-	// 		if (item["type"].as<std::string>() == "sphere") {
-	// 			point3 center = item["center"].as<vec3>();
-	// 			double radius
-	// 		}
-	// 	}
-	// }
+		world.spheres.push_back(sphere(center, radius, mat));
+	}
 
 	camera cam;
 
 	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 500;
+	cam.image_width = 1820;
+	cam.samples_per_pixel = 2000;
 	cam.max_depth = 50;
 	cam.initialize();
 

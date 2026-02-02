@@ -23,6 +23,7 @@ struct sphere{
 
 struct scene{
 	std::vector<sphere> spheres;
+	double ambient_light_strength = 0.5;
 };
 
 #endif
