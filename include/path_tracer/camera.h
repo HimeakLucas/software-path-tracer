@@ -1,14 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <vector>
-
 #include "vec3.h"
-#include "color.h"
 #include "ray.h"
-#include "interval.h"
 #include "utils.h"
-#include "scene.h"
 
 class camera  {
 public:
@@ -18,6 +13,8 @@ public:
 	int samples_per_pixel = 10;	
 	int max_depth = 10;
 	int image_height;
+	float focal_length = 1.0;
+	point3 center = point3(0, 0, 0);
 
 	ray get_ray(int i, int j) const {
 		auto offset = sample_square();
@@ -37,9 +34,6 @@ public:
 
 		pixel_samples_scale = 1.0 / samples_per_pixel;
 
-		center = point3(0, 0, 0);
-
-		auto focal_length = 1.0;
 		auto viewport_height = 2.0;
 		auto viewport_width = viewport_height * (double(image_width)/image_height);
 
@@ -60,7 +54,6 @@ public:
 
 
 private:
-	point3 center;
 	point3 pixel_00_loc;
 	vec3 pixel_delta_u;
 	vec3 pixel_delta_v;
