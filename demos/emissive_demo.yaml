@@ -15,12 +15,11 @@ materials:
     specular_probability: 0.95
 
   emissive_warm:
-    albedo: [0.8, 0.6, 0.2]
+    albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
-    emission_color: [0.8, 0.6, 0.2]
+    emission_color: [0.9, 0.7, 0.3]
     emission_strength: 1.0
-
 
 world:
   - type: sphere #center sphere
@@ -38,9 +37,9 @@ world:
     radius: 0.5
     material: "emissive_warm"
 
-  - type: sphere #left sphere
+  - type: sphere #right sphere
     center: [1, 0, -1]
     radius: 0.5
     material: "mettalic_green"
 
-ambient_light_strength: 0.0
+ambient_light_strength: 0.1
