@@ -9,3 +9,4 @@ build-debug
 build-profile
 build-perf
 .cache
+test_images

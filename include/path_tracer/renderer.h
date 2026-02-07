@@ -5,7 +5,6 @@
 #include "scene.h"
 #include "ray.h"
 #include "color.h"
-#include "interval.h"	
 
 class Renderer {
 private:

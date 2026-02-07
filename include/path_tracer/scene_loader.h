@@ -5,6 +5,8 @@
 #include <string>
 #include "camera.h"
 
+#include <iostream>
+
 //https://github.com/jbeder/yaml-cpp/wiki/Tutorial
 namespace YAML {
 template<>
@@ -42,7 +44,7 @@ public:
 		parse_ambient_light(world);
 	};
 
-	void load_camera(camera& cam) {}
+	void build_camera(camera& cam) {parse_camera(cam);}
 
 private:
 
@@ -90,6 +92,13 @@ private:
 
 	void parse_ambient_light(scene& world) { 
 		world.ambient_light_strength = m_scene_file["ambient_light_strength"].as<double>(0.0);
+	}
+
+	void parse_camera(camera& cam) {
+		auto cam_node = m_scene_file["camera"];
+
+		cam.center = cam_node["center"].as<vec3>(vec3(0, 0, 0));
+		cam.focal_length = cam_node["focal_length"].as<double>(1.0);
 	}
 };
 

@@ -13,9 +13,7 @@ int main(int argc, char* argv[]) {
 
 
 	camera cam;
-	cam.aspect_ratio = 16.0 / 9.0;
-	cam.focal_length = 1.0;
-	cam.center = point3(0, 0, 0.7);
+	loader.build_camera(cam);
 
 	std::string set_camera = argv[1];
 
