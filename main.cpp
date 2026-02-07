@@ -1,55 +1,48 @@
-#include "vec3.h"
-#include "scene.h"
-#include "camera.h"
-#include "renderer.h"
-#include <vector>
+#include "path_tracer/scene.h"
+#include "path_tracer/camera.h"
+#include "path_tracer/renderer.h"
+#include "path_tracer/benchmark.h"
+#include "path_tracer/scene_loader.h"
 
-int main() {
+int main(int argc, char* argv[]) {
 
-	sphere ball1(point3(0 , 0, -1.3), 0.5);
-	material mat1;
-	mat1.albedo = vec3(0.1, 0.2, 0.5);
-	mat1.smoothness = 0.0;
-	mat1.specular_probability = 0.0;
-	ball1.mat = mat1;
-
-	sphere ball2(point3(-1, 0, -1), 0.5);
-	material mat2;
-	mat2.albedo = vec3(0.8, 0.6, 0.2);
-	mat2.smoothness = 0.9;
-	mat2.specular_probability = 0.5;
-	ball2.mat = mat2;
-
-	sphere ball3(point3(1 , 0, -1), 0.5);
-	material mat3;
-	mat3.albedo = vec3(0.3, 0.8, 0.2);
-	mat3.smoothness = 0.98;
-	mat3.specular_probability = 1.96;
-	ball3.mat = mat3;
-
-	sphere earth(point3(0, -100.5, -1), 100);
-	material mat4;
-	mat4.albedo = vec3(0.8, 0.7, 0.9);
-	mat4.smoothness = 0.0;
-	mat4.specular_probability = 0.0;
-	earth.mat = mat4;
+	SceneLoader loader("demos/emissive_demo.yaml");
 
 	scene world;
-	world.spheres.push_back(ball1);
-	world.spheres.push_back(ball2);
-	world.spheres.push_back(ball3);
-	world.spheres.push_back(earth);
+	loader.build_world(world);
+
 
 	camera cam;
+	loader.build_camera(cam);
 
-	cam.aspect_ratio = 16.0 / 9.0;
-	cam.image_width = 1920;
-	cam.samples_per_pixel = 2000;
-	cam.max_depth = 50;
+	std::string set_camera = argv[1];
+
+	if (set_camera == "0") {
+		cam.aspect_ratio = 16.0 / 9.0;
+		cam.image_width = 400;
+		cam.samples_per_pixel = 100;
+		cam.max_depth = 50;
+
+	
+	} else if (set_camera == "1") {
+		cam.aspect_ratio = 16.0 / 9.0;
+		cam.image_width = 900;
+		cam.samples_per_pixel = 600;
+		cam.max_depth = 50;
+
+	
+	} else if (set_camera == "2") {
+		cam.aspect_ratio = 16.0 / 9.0;
+		cam.image_width = 1920;
+		cam.samples_per_pixel = 5000;
+		cam.max_depth = 50;
+	}
+
 	cam.initialize();
 
-
 	Renderer render;
-	render.render(world, cam);
-	
+	{
+		Timer timer(TimeUnit::Seconds);
+		render.render(world, cam);
+	}
 }

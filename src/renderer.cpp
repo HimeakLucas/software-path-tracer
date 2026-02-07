@@ -1,6 +1,6 @@
-#include "renderer.h"
-#include "utils.h"
-#include "vec3.h"
+#include "path_tracer/renderer.h"
+#include "path_tracer/utils.h"
+#include "path_tracer/vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -31,8 +31,9 @@ void Renderer::render(const scene& scene, const camera& camera) {
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
 	vec3 ray_color(1, 1, 1);
+	vec3 incoming_light(0, 0, 0);
 	ray bouncing_ray = r;
-
+	double ambient_light_strength = scene.ambient_light_strength;
 
 	for(int i = 0; i <= depth; i++) {
 		hit_record rec = closest_hit(scene, bouncing_ray);
@@ -48,17 +49,21 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
 			bouncing_ray.dir = bounce_direction;
 			bouncing_ray.orig = rec.hit_point;
+
+			vec3 emitted_light = material.emission_color * material.emission_strength;
+			incoming_light += emitted_light * ray_color;
 			ray_color *= rec.mat.albedo; //component wise multiplication;
 		}
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
 			auto a = 0.5 * (unit_direction.y() + 1.0);
-			color sky_color = lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
-			return ray_color * sky_color;
+			color sky_color = ambient_light_strength * lerp(a, color(0.5, 0.7, 1.0), color(1, 1, 1));
+			incoming_light += sky_color * ray_color;
+			return incoming_light;
 		}
 	}
 
-	return color(0, 0, 0);
+	return incoming_light;
 }
 
 
