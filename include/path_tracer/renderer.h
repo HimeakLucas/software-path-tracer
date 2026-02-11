@@ -5,6 +5,7 @@
 #include "scene.h"
 #include "ray.h"
 #include "color.h"
+#include "path_tracer/vec3.h"
 
 class Renderer {
 private:

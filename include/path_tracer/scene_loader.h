@@ -67,6 +67,7 @@ private:
 				mat.smoothness = data["smoothness"].as<double>(0.0);
 				mat.specular_probability = data["specular_probability"].as<double>(0.0);
 
+				mat.specular_color = data["specular_color"].as<vec3>(vec3(1.0, 1.0, 1.0));
 				mat.emission_strength = data["emission_strength"].as<double>(0.0);
 				mat.emission_color = data["emission_color"].as<vec3>(vec3(1.0, 1.0, 1.0));
 
@@ -98,7 +99,7 @@ private:
 		auto cam_node = m_scene_file["camera"];
 
 		cam.center = cam_node["center"].as<vec3>(vec3(0, 0, 0));
-		cam.focal_length = cam_node["focal_length"].as<double>(1.0);
+		cam.focal_length = cam_node["focal_length"].as<double>(2.0);
 	}
 };
 

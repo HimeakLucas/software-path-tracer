@@ -5,55 +5,64 @@ materials:
     specular_probability: 0.0
 
   ground_gray:
-    albedo: [0.8, 0.7, 0.9]
+    albedo: [0.5, 0.5, 0.5]
     smoothness: 0.0
     specular_probability: 0.0
 
   mettalic_yellow:
     albedo: [0.7, 0.7, 0.2]
-    smoothness: 0.95
+    smoothness: 0.85
     specular_probability: 0.95
+    specular_color: [0.7, 0.7, 0.2]
 
   matte_red:
     albedo: [0.9, 0.2, 0.3]
-    smoothness: 0.05
-    specular_probability: 0.05
+    smoothness: 0.99
+    specular_probability: 0.02
 
   glossy_white:
     albedo: [1.0, 1.0, 1.0]
-    smoothness: 1.0
+    smoothness: 0.98
     specular_probability: 0.2
+    specular_color: [1.0, 1.0, 1.0]
 
   fuzzy_purple:
     albedo: [0.9, 0.2, 0.9]
     smoothness: 0.70
-    specular_probability: 1.00
+    specular_probability: 0.98
+    specular_color: [0.9, 0.2, 0.9]
 
   metallic_black:
-    albedo: [0.1, 0.1, 0.1]
-    smoothness: 0.94
-    specular_probability: 0.95
+    albedo: [0.05, 0.05, 0.05]
+    smoothness: 0.7
+    specular_probability: 0.05
+    specular_color: [0.98, 0.98, 0.98]
 
   emissive_warm:
     albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
-    emission_color: [0.9, 0.7, 0.3]
-    emission_strength: 1.0  
+    emission_color: [0.95, 0.1, 0.1]
+    emission_strength: 2.5  
 
   emissive_cold:
     albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
-    emission_color: [0.3, 0.7, 0.9]
-    emission_strength: 1.0
+    emission_color: [0.1, 0.1, 0.95]
+    emission_strength: 2.5
 
-  emissive_white:
+  emissive_green:
     albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
+    emission_color: [0.1, 0.95, 0.1]
+    emission_strength: 2.5
+
+  emissive_white:
+    specular_probability: 0.0
     emission_color: [1.0, 1.0, 1.0]
-    emission_strength: 1.0
+    emission_strength: 2.5
 
 
 world:
@@ -65,15 +74,15 @@ world:
   - type: sphere
     center: [0, 0, -0.4]
     radius: 0.5
-    material: "matte_blue"
-
-  - type: sphere
-    center: [2.5, 0, -0.2]
-    radius: 0.5
     material: "matte_red"
 
   - type: sphere
-    center: [-3, 0.08, -1]
+    center: [2.5, -0.04, -0.2]
+    radius: 0.5
+    material: "matte_blue"
+
+  - type: sphere
+    center: [-3, 0.06, -1]
     radius: 0.6
     material: "fuzzy_purple"
 
@@ -95,18 +104,22 @@ world:
 
 
   - type: sphere
-    center: [2, 2.5, -1]
-    radius: 1.0
+    center: [2, 3, -3]
+    radius: 0.5
     material: "emissive_warm"
 
   - type: sphere
     center: [-2, 3, -3]
-    radius: 1.0
+    radius: 0.5
+    material: "emissive_green"
+
+  - type: sphere
+    center: [0, 3, -3]
+    radius: 0.5
     material: "emissive_cold"
 
 
 
-  - type: sphere
     center: [2.0, -0.43, -1.2]
     radius: 0.1
     material: "emissive_white"
@@ -132,7 +145,7 @@ world:
     material: "emissive_white"
 
   - type: sphere
-    center: [0.0, -0.42, 0.6]
+    center: [0.0, -0.39, 0.3]
     radius: 0.1
     material: "emissive_white"
 
@@ -146,8 +159,12 @@ world:
     radius: 0.1
     material: "emissive_white"
 
+  - type: sphere
+    center: [1.9, -0.44, 0.0]
+    radius: 0.1
+    material: "emissive_white"
 
-ambient_light_strength: 0.0
+ambient_light_strength: 0.02
 
 camera:
   center: [0.3, 1.0, 4.5]

@@ -6,6 +6,7 @@
 struct material {
 public:
 	vec3 albedo{0.5, 0.5, 0.5};
+	vec3 specular_color{1, 1, 1};
 	vec3 emission_color{0, 0, 0};
 	float smoothness = 0;
 	float specular_probability = 0;

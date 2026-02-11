@@ -1,14 +1,13 @@
 #include "path_tracer/renderer.h"
-#include "path_tracer/utils.h"
 #include "path_tracer/vec3.h"
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
-	float height = camera.image_height;
-	float width = camera.image_width;
-	float samples_per_pixel = camera.samples_per_pixel;
-	float pixel_samples_scale = 1/samples_per_pixel;
-	float max_depth = camera.max_depth;
+	int height = camera.image_height;
+	int width = camera.image_width;
+	int samples_per_pixel = camera.samples_per_pixel;
+	float pixel_samples_scale = 1.0/samples_per_pixel;
+	int max_depth = camera.max_depth;
 
 	std::cout << "P3\n" << width << ' ' << height << "\n255\n";
 
@@ -44,15 +43,30 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 			bool is_specular_bounce = material.specular_probability >= utils::random_double();
 
 			vec3 diffuse_direction = rec.normal + random_unit_vector();
-			vec3 specular_direction = reflect(bouncing_ray.direction(), rec.normal);
-			vec3 bounce_direction = lerp(material.smoothness * is_specular_bounce, specular_direction, diffuse_direction);
 
-			bouncing_ray.dir = bounce_direction;
-			bouncing_ray.orig = rec.hit_point;
+			vec3 bounce_dir;
+			if (is_specular_bounce) {
 
-			vec3 emitted_light = material.emission_color * material.emission_strength;
-			incoming_light += emitted_light * ray_color;
-			ray_color *= rec.mat.albedo; //component wise multiplication;
+				vec3 specular_direction = reflect(bouncing_ray.direction(), rec.normal);
+				bounce_dir = lerp(material.smoothness, diffuse_direction, specular_direction);
+				bouncing_ray.dir = unit_vector(bounce_dir);
+				bouncing_ray.orig = rec.hit_point;
+
+				vec3 emitted_light = material.emission_color * material.emission_strength;
+				incoming_light += emitted_light * ray_color;
+
+				ray_color *= material.specular_color;
+			} else {
+
+				bounce_dir = diffuse_direction;
+				bouncing_ray.dir = unit_vector(bounce_dir);
+				bouncing_ray.orig = rec.hit_point;
+
+				vec3 emitted_light = material.emission_color * material.emission_strength;
+				incoming_light += emitted_light * ray_color;
+
+				ray_color *= material.albedo;
+			}
 		}
 		else {
 			vec3 unit_direction = unit_vector(bouncing_ray.direction());
@@ -106,9 +120,9 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 	auto sqrtd = std::sqrt(discriminant);
 	
 	auto root = (h - sqrtd) / a;
-	if (root < 0.001) {
+	if (root < 0.00000001) {
 		root = (h + sqrtd) / a;
-		if(root < 0.001) {
+		if(root < 0.00000001) {
 			return rec;	
 		}
 	}
