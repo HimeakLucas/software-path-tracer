@@ -42,22 +42,23 @@ color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
 
 			bool is_specular_bounce = material.specular_probability >= utils::random_double();
 
-			vec3 diffuse_direction = rec.normal + random_unit_vector();
-
 			vec3 bounce_dir;
 			if (is_specular_bounce) {
-
+				float fuzz = (1 - rec.mat.smoothness);
 				vec3 specular_direction = reflect(bouncing_ray.direction(), rec.normal);
-				bounce_dir = lerp(material.smoothness, diffuse_direction, specular_direction);
+				bounce_dir = specular_direction + fuzz * random_in_unit_sphere();
+				
 				bouncing_ray.dir = unit_vector(bounce_dir);
 				bouncing_ray.orig = rec.hit_point;
 
 				vec3 emitted_light = material.emission_color * material.emission_strength;
 				incoming_light += emitted_light * ray_color;
-
 				ray_color *= material.specular_color;
+
+
 			} else {
 
+				vec3 diffuse_direction = rec.normal + random_unit_vector();
 				bounce_dir = diffuse_direction;
 				bouncing_ray.dir = unit_vector(bounce_dir);
 				bouncing_ray.orig = rec.hit_point;
