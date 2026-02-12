@@ -1,8 +1,6 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <format>
-#include <string>
 
 enum class TimeUnit {
 	Microseconds,
@@ -43,7 +41,7 @@ public:
 			}
 			case TimeUnit::Seconds: {
 				float s = duration_us * 1e-6;
-				std::cerr << std::setprecision(3) << s << "s\n";
+				std::cerr << std::fixed << std::setprecision(3) << s << "s\n";
 				break;
 			}
 		}
