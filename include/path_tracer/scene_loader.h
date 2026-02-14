@@ -5,8 +5,6 @@
 #include <string>
 #include "camera.h"
 
-#include <iostream>
-
 //https://github.com/jbeder/yaml-cpp/wiki/Tutorial
 namespace YAML {
 template<>
@@ -99,9 +97,8 @@ private:
 		auto cam_node = m_scene_file["camera"];
 
 		cam.center = cam_node["center"].as<vec3>(vec3(0, 0, 0));
-		cam.focal_length = cam_node["focal_length"].as<double>(2.0);
+		cam.vfov = cam_node["fov"].as<double>(90.0);
 	}
 };
-
 
 

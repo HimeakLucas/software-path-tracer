@@ -35,7 +35,7 @@ materials:
     emission_color: [1.0, 1.0, 1.0]
     emission_strength: 18.5
 
-  ground_gray:
+  ground_purple:
     albedo: [0.6, 0.1, 0.6]
     smoothness: 0.0
     specular_probability: 0.0
@@ -80,7 +80,7 @@ world:
   - type: sphere
     center: [0, -100.5, -1]
     radius: 100
-    material: "ground_gray"
+    material: "ground_purple"
 
 
 
@@ -88,6 +88,6 @@ world:
 ambient_light_strength: 0.01
 
 camera:
-  center: [0.0, 1.0, 4.5]
-  focal_length: 2.0
+  center: [0.0, 1.0, 2.5]
+  fov: 65
 

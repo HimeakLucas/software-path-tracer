@@ -1,21 +1,21 @@
 materials:
   matte_blue:
     albedo: [0.1, 0.2, 0.5]
-    smoothness: 0.0
-    specular_probability: 0.0
+    smoothness: 0.5
+    specular_probability: 0.02
 
   ground_gray:
-    albedo: [0.5, 0.5, 0.5]
-    smoothness: 0.0
-    specular_probability: 0.0
+    albedo: [0.9, 0.9, 0.9]
+    smoothness: 0.5
+    specular_probability: 0.02
 
   mettalic_yellow:
-    albedo: [0.7, 0.7, 0.2]
-    smoothness: 0.85
-    specular_probability: 0.95
-    specular_color: [0.7, 0.7, 0.2]
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 0.99
+    specular_probability: 0.99
+    specular_color: [0.9, 0.8, 0.4]
 
-  matte_red:
+  glossy_red:
     albedo: [0.9, 0.2, 0.3]
     smoothness: 0.99
     specular_probability: 0.02
@@ -27,14 +27,14 @@ materials:
     specular_color: [1.0, 1.0, 1.0]
 
   fuzzy_purple:
-    albedo: [0.9, 0.2, 0.9]
+    albedo: [0.0, 0.0, 0.0]
     smoothness: 0.70
-    specular_probability: 0.98
-    specular_color: [0.9, 0.2, 0.9]
+    specular_probability: 0.99
+    specular_color: [0.9, 0.6, 0.9]
 
-  metallic_black:
+  soft_black:
     albedo: [0.05, 0.05, 0.05]
-    smoothness: 0.7
+    smoothness: 0.50
     specular_probability: 0.05
     specular_color: [0.98, 0.98, 0.98]
 
@@ -43,23 +43,24 @@ materials:
     smoothness: 0.0
     specular_probability: 0.0
     emission_color: [0.95, 0.1, 0.1]
-    emission_strength: 2.5  
+    emission_strength: 3.5  
 
   emissive_cold:
     albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
     emission_color: [0.1, 0.1, 0.95]
-    emission_strength: 2.5
+    emission_strength: 3.5
 
   emissive_green:
     albedo: [0.0, 0.0, 0.0]
     smoothness: 0.0
     specular_probability: 0.0
     emission_color: [0.1, 0.95, 0.1]
-    emission_strength: 2.5
+    emission_strength: 3.5
 
   emissive_white:
+    albedo: [0.0, 0.0, 0.0]
     specular_probability: 0.0
     emission_color: [1.0, 1.0, 1.0]
     emission_strength: 2.5
@@ -74,7 +75,7 @@ world:
   - type: sphere
     center: [0, 0, -0.4]
     radius: 0.5
-    material: "matte_red"
+    material: "glossy_red"
 
   - type: sphere
     center: [2.5, -0.04, -0.2]
@@ -87,7 +88,7 @@ world:
     material: "fuzzy_purple"
 
   - type: sphere
-    center: [-1.5, 0.15, -3.5]
+    center: [-1.5, 0.20, -3.5]
     radius: 0.7
     material: "mettalic_yellow"
 
@@ -99,7 +100,7 @@ world:
   - type: sphere
     center: [4.5, 0.1, -1.5]
     radius: 0.7
-    material: "metallic_black"
+    material: "soft_black"
 
 
 
@@ -164,8 +165,8 @@ world:
     radius: 0.1
     material: "emissive_white"
 
-ambient_light_strength: 0.02
+ambient_light_strength: 0.01
 
 camera:
-  center: [0.3, 1.0, 4.5]
-  focal_length: 2.0
+  center: [0.0, 1.0, 4.0]
+  fov: 65 
