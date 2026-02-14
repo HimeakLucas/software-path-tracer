@@ -32,11 +32,17 @@ int main(int argc, char* argv[]) {
 		cam.samples_per_pixel = 900;
 		cam.max_depth = 50;
 
-	
 	} else if (set_camera == "2") {
 		cam.aspect_ratio = 16.0 / 9.0;
+		cam.image_width = 1080;
+		cam.samples_per_pixel = 1500;
+		cam.max_depth = 50;
+
+
+	} else if (set_camera == "3") {
+		cam.aspect_ratio = 16.0 / 9.0;
 		cam.image_width = 1920;
-		cam.samples_per_pixel = 25000;
+		cam.samples_per_pixel = 15000;
 		cam.max_depth = 50;
 	}
 
