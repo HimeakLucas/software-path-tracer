@@ -8,13 +8,13 @@ materials:
   glossy_white2:
     albedo: [1.0, 1.0, 1.0]
     smoothness: 1.00
-    specular_probability: 0.4
+    specular_probability: 0.7
     specular_color: [1.0, 1.0, 1.0]
 
   glossy_white3:
     albedo: [1.0, 1.0, 1.0]
     smoothness: 1.00
-    specular_probability: 0.2
+    specular_probability: 0.3
     specular_color: [1.0, 1.0, 1.0]
 
   glossy_white4:
@@ -73,8 +73,8 @@ world:
 
 
   - type: sphere
-    center: [0, 2.5, -0]
-    radius: 0.5
+    center: [0, 4.5, -0]
+    radius: 1.0
     material: "emissive_white"
 
   - type: sphere
@@ -88,6 +88,7 @@ world:
 ambient_light_strength: 0.01
 
 camera:
-  center: [0.0, 1.0, 2.5]
   fov: 65
-
+  look_from: [-3.0, 2.0, 2.0]
+  look_at: [-1, 0, -3]
+ 

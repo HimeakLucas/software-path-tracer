@@ -96,8 +96,9 @@ private:
 	void parse_camera(camera& cam) {
 		auto cam_node = m_scene_file["camera"];
 
-		cam.center = cam_node["center"].as<vec3>(vec3(0, 0, 0));
-		cam.vfov = cam_node["fov"].as<double>(90.0);
+		cam.look_from = cam_node["look_from"].as<vec3>(vec3(0, 0, 0));
+		cam.look_at = cam_node["look_at"].as<vec3>(vec3(0, 0, -1));
+		cam.vfov = cam_node["fov"].as<double>(65.0);
 	}
 };
 
