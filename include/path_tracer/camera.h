@@ -13,8 +13,12 @@ public:
 	int samples_per_pixel = 10;	
 	int max_depth = 10;
 	int image_height;
-	float focal_length = 1.0;
-	point3 center = point3(0, 0, 0);
+
+	double vfov= 90;
+	point3 look_from = point3(0, 0, 0);
+	point3 look_at = point3(0, 0, -1);
+	vec3 vup = vec3(0, 1, 0);
+
 
 	ray get_ray(int i, int j) const {
 		auto offset = sample_square();
@@ -25,7 +29,7 @@ public:
 		auto ray_origin = center;
 		auto ray_direction = pixel_sample - ray_origin;
 
-		return ray(ray_origin, ray_direction);
+		return ray(ray_origin, unit_vector(ray_direction));
 	}
 
 	void initialize() {
@@ -34,21 +38,29 @@ public:
 
 		pixel_samples_scale = 1.0 / samples_per_pixel;
 
-		auto viewport_height = 2.0;
+		center = look_from;
+		auto focal_length = (look_from - look_at).length();
+
+		w = unit_vector(look_from - look_at);
+		u = unit_vector(cross(vup, w));
+		v = cross(w, u);
+
+		double vfov_radians = utils::degrees_to_radians(vfov);
+		auto viewport_height = 2 * std::tan(vfov_radians /2) * focal_length;
 		auto viewport_width = viewport_height * (double(image_width)/image_height);
 
-		auto viewport_u = vec3(viewport_width, 0, 0);
-		auto viewport_v = vec3(0, -viewport_height, 0);
+		auto viewport_u = u * viewport_width;
+		auto viewport_v = -v * viewport_height;
 
 		pixel_delta_u = viewport_u / image_width;
 		pixel_delta_v = viewport_v / image_height;
 
 		auto viewport_upper_left = center
-					-vec3(0, 0, focal_length)
+					-(w * focal_length)
 					-viewport_u/2
 					-viewport_v/2;
 
-		 pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+		pixel_00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 	}
 
 
@@ -58,6 +70,8 @@ private:
 	vec3 pixel_delta_u;
 	vec3 pixel_delta_v;
 	double pixel_samples_scale; //color scale factor for a sum of pixel samples
+	vec3 u, v, w;
+	point3 center = point3(0, 0, 0);
 
 	vec3 sample_square() const {
 		return vec3(utils::random_double() - 0.5, utils::random_double() - 0.5, 0);
