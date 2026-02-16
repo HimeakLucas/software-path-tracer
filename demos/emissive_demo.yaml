@@ -170,4 +170,5 @@ ambient_light_strength: 0.02
 camera:
   look_from: [-2.0, 3.2, 3.3]
   look_at: [0, 0, -2.5]
+  view_up: [0.2, 1.0, 0.2]
   fov: 65 
