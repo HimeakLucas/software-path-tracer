@@ -157,63 +157,67 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 
 Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray& r) {
 	hit_record rec;
+	rec.hit_something = false;
 
-	point3 v0 = triangle.vertices[0];
-	point3 v1 = triangle.vertices[1];
-	point3 v2 = triangle.vertices[2];
+//       C-v2
+//	  /\
+//	 /  \
+//	/  P \
+//     /______\
+//   A-v0    B-v1
 
-	vec3 v01 = v1 - v0;
-	vec3 v12 = v2 - v1;
-	vec3 v20 = v0 - v2;
 
-	vec3 v02 = v2 - v0;
+	const double EPS = 1e-8;
 
-	vec3 normal = unit_vector(cross(v01, v02));
+	point3 A = triangle.vertices[0];
+	point3 B = triangle.vertices[1];
+	point3 C = triangle.vertices[2];
 
-	//check if the ray is parallel to the plane
+	vec3 AB = B - A;
+	vec3 BC = C - B;
+	vec3 CA = A - C;
+
+	vec3 AC = C - A;
+
+	vec3 normal = cross(AB, AC);
+	double ABC_area = normal.length();
+
 	double dem = dot(normal, r.direction());
-	if (dem == 1e-8) {
-		rec.hit_something = false;
+	if (std::fabs(dem) <= EPS)
 		return rec;
-	}
-
-	//plane equation: Ax + By + Cz + D = 0
-	double D = -dot(normal, v0); //could be any point in the plane instead of v0
-
-	double distance = - (dot(normal, r.origin()) + D) / (dem);
-
-	if(distance < 0.00000001) {
-		rec.hit_something = false;
-		return rec;
-	}
-
-	point3 P = r.at(distance);
 	
 
-
-	vec3 v0P = P - v0;
-	if( dot(cross(v01, v0P),  normal) < 0) 	{
-		rec.hit_something = false;
+	//plane equation: Ax + By + Cz + D = 0
+	double D = -dot(normal, A); //could be any point in the plane instead of v0
+	double distance = - (dot(normal, r.origin()) + D) / (dem);
+	if(distance <= EPS)
 		return rec;
-	}
+	
+	point3 P = r.at(distance);
+	
+	vec3 AP = P - A; 
+	vec3 BP = P - B; 
+	vec3 CP = P - C; 
+	
+	double CAP_area = cross(CA, CP).length(); 
+	double ABP_area = cross(AB, AP).length();
+	double BCP_area = cross(BC, BP).length();
 
-	vec3 v1P = P - v1;
-	if( dot(cross(v12, v1P),  normal) < 0) 	{
-		rec.hit_something = false;
-		return rec;
-	}
+	double v = CAP_area / ABC_area;
+	double w = ABP_area / ABC_area;
+	double u = BCP_area / ABC_area;
 
-	vec3 v2P = P - v2;
-	if( dot(cross(v20, v2P),  normal) < 0) 	{
-		rec.hit_something = false;
+	if(v+u+w > 1 + EPS)
 		return rec;
-	}
+	
+	if(v < EPS || w < EPS || u < EPS)
+		return rec;
 
 	rec.hit_something = true;
 	rec.distance = distance;
 	rec.hit_point = r.at(rec.distance);
 	rec.mat = triangle.mat;
-	rec.set_face_normal(r, normal);
+	rec.set_face_normal(r, unit_vector(normal));
 
 	return rec;
 }
