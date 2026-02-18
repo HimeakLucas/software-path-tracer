@@ -162,11 +162,11 @@ Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray&
 	point3 v1 = triangle.vertices[1];
 	point3 v2 = triangle.vertices[2];
 
-	vec3 v01 = v0 - v1;
-	vec3 v12 = v1 - v2;
-	vec3 v20 = v2 - v0;
+	vec3 v01 = v1 - v0;
+	vec3 v12 = v2 - v1;
+	vec3 v20 = v0 - v2;
 
-	vec3 v02 = v0 - v2;
+	vec3 v02 = v2 - v0;
 
 	vec3 normal = unit_vector(cross(v01, v02));
 
@@ -191,19 +191,19 @@ Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray&
 	
 
 
-	vec3 v0P = v0 - P;
+	vec3 v0P = P - v0;
 	if( dot(cross(v01, v0P),  normal) < 0) 	{
 		rec.hit_something = false;
 		return rec;
 	}
 
-	vec3 v1P = v1 - P;
+	vec3 v1P = P - v1;
 	if( dot(cross(v12, v1P),  normal) < 0) 	{
 		rec.hit_something = false;
 		return rec;
 	}
 
-	vec3 v2P = v2 - P;
+	vec3 v2P = P - v2;
 	if( dot(cross(v20, v2P),  normal) < 0) 	{
 		rec.hit_something = false;
 		return rec;
