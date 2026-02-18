@@ -32,11 +32,11 @@ public:
 
 		switch(m_output_unit) {
 			case TimeUnit::Microseconds:
-				std::cerr << duration_us << "us\n";
+				std::cerr << std::fixed << std::setprecision(3) << duration_us << "us\n";
 				break;
 			case TimeUnit::Miliseconds: {
 				float ms = duration_us * 1e-3;
-				std::cerr << ms << " ms\n";
+				std::cerr << std::fixed << std::setprecision(3) << ms << " ms\n";
 				break;
 			}
 			case TimeUnit::Seconds: {
