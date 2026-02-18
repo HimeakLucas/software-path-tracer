@@ -101,6 +101,20 @@ Renderer::hit_record Renderer::closest_hit(const scene& scene, const ray& r) {
 			}
 		}
 	}
+
+	for (const auto& triangle : scene.triangles) {
+
+		hit_record triangle_rec = Renderer::hit_triangle(triangle, r);
+
+		if (triangle_rec.hit_something) {
+			triangle_rec.hit_something = true;
+			if (triangle_rec.distance < closest_so_far) {
+				scene_rec = triangle_rec;
+				closest_so_far = scene_rec.distance;
+			}
+		}
+	}
+
 	return scene_rec;
 };
 			
@@ -137,5 +151,69 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 	rec.set_face_normal(r, outward_normal);
 
 	
+	return rec;
+}
+
+
+Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray& r) {
+	hit_record rec;
+
+	point3 v0 = triangle.vertices[0];
+	point3 v1 = triangle.vertices[1];
+	point3 v2 = triangle.vertices[2];
+
+	vec3 v01 = v0 - v1;
+	vec3 v12 = v1 - v2;
+	vec3 v20 = v2 - v0;
+
+	vec3 v02 = v0 - v2;
+
+	vec3 normal = unit_vector(cross(v01, v02));
+
+	//check if the ray is parallel to the plane
+	double dem = dot(normal, r.direction());
+	if (dem == 1e-8) {
+		rec.hit_something = false;
+		return rec;
+	}
+
+	//plane equation: Ax + By + Cz + D = 0
+	double D = -dot(normal, v0); //could be any point in the plane instead of v0
+
+	double distance = - (dot(normal, r.origin()) + D) / (dem);
+
+	if(distance < 0.00000001) {
+		rec.hit_something = false;
+		return rec;
+	}
+
+	point3 P = r.at(distance);
+	
+
+
+	vec3 v0P = v0 - P;
+	if( dot(cross(v01, v0P),  normal) < 0) 	{
+		rec.hit_something = false;
+		return rec;
+	}
+
+	vec3 v1P = v1 - P;
+	if( dot(cross(v12, v1P),  normal) < 0) 	{
+		rec.hit_something = false;
+		return rec;
+	}
+
+	vec3 v2P = v2 - P;
+	if( dot(cross(v20, v2P),  normal) < 0) 	{
+		rec.hit_something = false;
+		return rec;
+	}
+
+	rec.hit_something = true;
+	rec.distance = distance;
+	rec.hit_point = r.at(rec.distance);
+	rec.mat = triangle.mat;
+	rec.set_face_normal(r, normal);
+
 	return rec;
 }

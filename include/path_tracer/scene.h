@@ -22,8 +22,15 @@ struct sphere{
 	material mat;
 };
 
+struct triangle{
+	vec3 normal;
+	point3 vertices[3];
+	material mat;
+};
+
 struct scene{
 	std::vector<sphere> spheres;
+	std::vector<triangle> triangles;
 	double ambient_light_strength = 0.5;
 };
 
