@@ -1,5 +1,6 @@
 #include "path_tracer/renderer.h"
 #include "path_tracer/vec3.h"
+#include <cmath>
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -159,14 +160,34 @@ Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray&
 	hit_record rec;
 	rec.hit_something = false;
 
-//       C-v2
-//	  /\
-//	 /  \
-//	/  P \
-//     /______\
-//   A-v0    B-v1
+	//       C-v2
+	//	  /\
+	//	 /  \
+	//	/  P \
+	//     /______\
+	//   A-v0    B-v1
 
-
+	// https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+	// ray-triangle intersection: O - A = -tD + uAB + vAC
+	//
+	// M = [-D, AB, AC]
+	// T = O - A
+	// X = [t, u, v]
+	//
+	// MX = T
+	//
+	// Cramer's Rule:
+	// [t, u, v]  = 1 / det(M) * [det[mt]. det[mu], det[mv]]
+	//
+	// det(M)  = (D x AC) * AB
+	// det(Mt) = (T x AB) * AC
+	// det(Mu) = (D x AC) * T
+	// det(Mv) = (T x AB) * D
+	//
+	// P = D x AC;  Q = T x AB
+	//
+	// [t, u, v]  = 1 / (P * AC) * [Q * AC, P * T, Q * D]
+	
 	const double EPS = 1e-8;
 
 	point3 A = triangle.vertices[0];
@@ -174,50 +195,37 @@ Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray&
 	point3 C = triangle.vertices[2];
 
 	vec3 AB = B - A;
-	vec3 BC = C - B;
-	vec3 CA = A - C;
-
 	vec3 AC = C - A;
 
-	vec3 normal = cross(AB, AC);
-	double ABC_area = normal.length();
 
-	double dem = dot(normal, r.direction());
-	if (std::fabs(dem) <= EPS)
-		return rec;
-	
+	vec3 D = r.direction();
+	vec3 P = cross(D, AC);
+	double det = (dot(P, AB));
+	if (std::fabs(det) <= EPS) return rec;
 
-	//plane equation: Ax + By + Cz + D = 0
-	double D = -dot(normal, A); //could be any point in the plane instead of v0
-	double distance = - (dot(normal, r.origin()) + D) / (dem);
-	if(distance <= EPS)
-		return rec;
-	
-	point3 P = r.at(distance);
-	
-	vec3 AP = P - A; 
-	vec3 BP = P - B; 
-	vec3 CP = P - C; 
-	
-	double CAP_area = cross(CA, CP).length(); 
-	double ABP_area = cross(AB, AP).length();
-	double BCP_area = cross(BC, BP).length();
+	double inv_det = 1 / det;
 
-	double v = CAP_area / ABC_area;
-	double w = ABP_area / ABC_area;
-	double u = BCP_area / ABC_area;
+	vec3 T = r.origin() - A;
+	double u = inv_det * dot(P, T);
+	if(u < EPS || u > 1 + EPS) return rec;
 
-	if(v+u+w > 1 + EPS)
-		return rec;
-	
-	if(v < EPS || w < EPS || u < EPS)
-		return rec;
+	vec3 Q = cross(T, AB);
+	double v = inv_det * dot(Q, D);
+	if(v < EPS || v > 1 + EPS)  return rec;
+
+	if(u + v >= 1 + EPS) return rec;
+
+	double t = inv_det * dot(Q, AC);
+	if(t <= EPS) return rec;
+
+
+	vec3 normal = unit_vector(cross(AB, AC));	
 
 	rec.hit_something = true;
-	rec.distance = distance;
-	rec.hit_point = r.at(rec.distance);
+	rec.distance = t;
+	rec.hit_point = r.at(t);
 	rec.mat = triangle.mat;
-	rec.set_face_normal(r, unit_vector(normal));
+	rec.set_face_normal(r, normal);
 
 	return rec;
 }
