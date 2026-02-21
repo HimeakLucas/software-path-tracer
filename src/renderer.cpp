@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstddef>
 #include <vector>
+#include <thread>
+#include <atomic>
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -19,20 +21,47 @@ void Renderer::render(const scene& scene, const camera& camera) {
 
 	std::vector<color> frame_buffer(total_pixels, color{0, 0, 0});
 
-	for(int j = 0; j < height; j++) {
-		std::clog << "\rScanLines remaining: " << (height - j) << ' ' << std::flush;
-		for(int i = 0; i < width; i++){
-			color pixel_color(0, 0, 0);
+	unsigned int thread_count = std::thread::hardware_concurrency();
 
-			for(int sample = 0; sample < samples_per_pixel; sample++) {
-				ray r = camera.get_ray(i, j);
-				pixel_color += trace_ray(scene, r, max_depth);
+	std::atomic<int> next_row = 0; ////basicaly thread safe ints to be accesed from various threads at the same time
+	std::atomic<int> rows_done = 0;
+
+	std::vector<std::thread> workers;
+	workers.reserve(thread_count);
+
+	for (unsigned int tid = 0; tid < thread_count; tid++){
+		workers.push_back(std::thread([&, tid](){
+			
+			while (true) {
+				int j = next_row.fetch_add(1);
+				if (j >= height) break;
+
+				for(int i = 0; i < width; i++){
+					color pixel_color(0, 0, 0);
+
+					for(int sample = 0; sample < samples_per_pixel; sample++) {
+						ray r = camera.get_ray(i, j);
+						pixel_color += trace_ray(scene, r, max_depth);
+					}
+
+					size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
+					frame_buffer[pixel_idx] = pixel_samples_scale * pixel_color;
+				}
+
+				rows_done.fetch_add(1);
+
 			}
 
-			size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
-			frame_buffer[pixel_idx] = pixel_samples_scale * pixel_color;
-		}
+		}));
 	}
+
+	while (rows_done.load() < height) {
+	 	std::clog << "\rScanLines remaining: " << (height - rows_done.load()) << ' ' << std::flush;
+		std::this_thread::sleep_for(std::chrono::milliseconds(150));
+	}
+
+	for (auto &t: workers) if (t.joinable()) t.join();
+
 	std::clog << "\rDone                                   \n";
 
 	for(int j = 0; j < height; j++) {
