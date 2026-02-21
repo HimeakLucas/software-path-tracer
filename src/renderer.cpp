@@ -1,6 +1,9 @@
 #include "path_tracer/renderer.h"
+#include "path_tracer/color.h"
 #include "path_tracer/vec3.h"
 #include <cmath>
+#include <cstddef>
+#include <vector>
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -11,21 +14,50 @@ void Renderer::render(const scene& scene, const camera& camera) {
 	int max_depth = camera.max_depth;
 
 	std::cout << "P3\n" << width << ' ' << height << "\n255\n";
+	
+	size_t total_pixels = static_cast<size_t>(width) * static_cast<size_t>(height); //casting to size_t for safety
+
+	std::vector<color> frame_buffer(total_pixels, color{0, 0, 0});
 
 	for(int j = 0; j < height; j++) {
 		std::clog << "\rScanLines remaining: " << (height - j) << ' ' << std::flush;
 		for(int i = 0; i < width; i++){
 			color pixel_color(0, 0, 0);
-			
+
 			for(int sample = 0; sample < samples_per_pixel; sample++) {
 				ray r = camera.get_ray(i, j);
 				pixel_color += trace_ray(scene, r, max_depth);
 			}
 
-			write_color(std::cout, pixel_samples_scale * pixel_color);
+			size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
+			frame_buffer[pixel_idx] = pixel_samples_scale * pixel_color;
 		}
 	}
 	std::clog << "\rDone                                   \n";
+
+	for(int j = 0; j < height; j++) {
+		for(int i = 0; i < width; i++) {
+			size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
+			write_color(std::cout, frame_buffer[pixel_idx]);
+		}
+	}
+
+	
+
+	// for(int j = 0; j < height; j++) {
+	// 	std::clog << "\rScanLines remaining: " << (height - j) << ' ' << std::flush;
+	// 	for(int i = 0; i < width; i++){
+	// 		color pixel_color(0, 0, 0);
+	//
+	// 		for(int sample = 0; sample < samples_per_pixel; sample++) {
+	// 			ray r = camera.get_ray(i, j);
+	// 			pixel_color += trace_ray(scene, r, max_depth);
+	// 		}
+	//
+	// 		write_color(std::cout, pixel_samples_scale * pixel_color);
+	// 	}
+	// }
+	// std::clog << "\rDone                                   \n";
 };
 
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
