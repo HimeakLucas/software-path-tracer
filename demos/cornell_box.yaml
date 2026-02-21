@@ -1,0 +1,196 @@
+materials:
+  matte_blue:
+    albedo: [0.1, 0.2, 0.5]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  matte_green:
+    albedo: [0.1, 0.5, 0.2]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  matte_red:
+    albedo: [0.7, 0.17, 0.1]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  matte_yellow:
+    albedo: [0.5, 0.5, 0.1]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  ground_gray:
+    albedo: [0.9, 0.9, 0.9]
+    smoothness: 0.5
+    specular_probability: 0.02
+    
+  dark_gray:
+    albedo: [0.2, 0.2, 0.2]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+
+  emissive_white:
+    albedo: [0.0, 0.0, 0.0]
+    specular_probability: 0.0
+    emission_color: [1.0, 1.0, 1.0]
+    emission_strength: 3.5
+
+  glossy_white1:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 1.00
+    specular_probability: 1.0
+    specular_color: [1.0, 1.0, 1.0]
+
+  glossy_white2:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 1.00
+    specular_probability: 0.4
+    specular_color: [1.0, 1.0, 1.0]
+
+  glossy_white3:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 1.00
+    specular_probability: 0.15
+    specular_color: [1.0, 1.0, 1.0]
+
+  glossy_white4:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 1.00
+    specular_probability: 0.08
+    specular_color: [1.0, 1.0, 1.0]
+
+
+# variáveis (scalars reutilizáveis)
+vars:
+  WH:  &WH   224   # +half width
+  NWH: &NWH  -224  # -half width
+  HH:  &HH   126   # +half height
+  NHH: &NHH  -126  # -half height
+  DP:  &DP   300   # +depth
+  NDP: &NDP  -100  # -depth
+  LS:  &LS   90
+  NLS: &NLS  -50
+  LH:  &LH   125
+
+
+world:
+
+#BOTTON FACE
+  - type: triangle 
+    v0: [*NWH, *NHH, *DP]
+    v1: [*WH,  *NHH, *DP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "dark_gray"
+
+  - type: triangle 
+    v0: [*WH,  *NHH, *NDP]
+    v1: [*WH,  *NHH, *DP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "dark_gray"
+
+#UP FACE
+  - type: triangle 
+    v0: [*NWH, *HH, *DP]
+    v1: [*WH,  *HH, *DP]
+    v2: [*NWH, *HH, *NDP]
+    material: "ground_gray"
+
+  - type: triangle 
+    v0: [*WH,  *HH, *NDP]
+    v1: [*WH,  *HH, *DP]
+    v2: [*NWH, *HH, *NDP]
+    material: "ground_gray"
+
+#BACK FACE
+  - type: triangle 
+    v0: [*NWH, *HH, *NDP]
+    v1: [*WH,  *HH, *NDP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "matte_blue"
+
+  - type: triangle 
+    v0: [*WH,  *NHH, *NDP]
+    v1: [*WH,  *HH,  *NDP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "matte_blue"
+    
+#FRONT FACE
+  - type: triangle 
+    v0: [*NWH, *HH, *DP]
+    v1: [*WH,  *HH, *DP]
+    v2: [*NWH, *NHH, *DP]
+    material: "matte_yellow"
+
+  - type: triangle 
+    v0: [*WH,  *NHH, *DP]
+    v1: [*WH,  *HH,  *DP]
+    v2: [*NWH, *NHH, *DP]
+    material: "matte_yellow"
+#LEFT FACE
+  - type: triangle 
+    v0: [*NWH, *NHH, *DP]
+    v1: [*NWH, *HH,  *DP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "matte_green"
+
+  - type: triangle 
+    v0: [*NWH, *HH,  *NDP]
+    v1: [*NWH, *HH,  *DP]
+    v2: [*NWH, *NHH, *NDP]
+    material: "matte_green"
+
+#RIGHT FACE
+  - type: triangle 
+    v0: [*WH, *NHH, *DP]
+    v1: [*WH, *HH,  *DP]
+    v2: [*WH, *NHH, *NDP]
+    material: "matte_red"
+
+  - type: triangle 
+    v0: [*WH, *HH,  *NDP]
+    v1: [*WH, *HH,  *DP]
+    v2: [*WH, *NHH, *NDP]
+    material: "matte_red"
+
+#LIGHT
+  - type: triangle 
+    v0: [-50, *LH, 50]
+    v1: [50,  *LH, 50]
+    v2: [-50, *LH, -50]
+    material: "emissive_white"
+
+  - type: triangle 
+    v0: [50,  *LH, -50]
+    v1: [50,  *LH, 50]
+    v2: [-50, *LH, -50]
+    material: "emissive_white"
+
+#SPHERES
+  - type: sphere
+    center: [50, -0, 0]
+    radius: 40
+    material: "glossy_white3"
+    
+  - type: sphere
+    center: [150, -0, 0]
+    radius: 40
+    material: "glossy_white4"
+
+  - type: sphere
+    center: [-50, -0, 0]
+    radius: 40
+    material: "glossy_white2"
+
+  - type: sphere
+    center: [-150, -0, 0]
+    radius: 40
+    material: "glossy_white1"
+
+ambient_light_strength: 0.0
+
+camera:
+  look_from: [0.0, 0.0, 290]
+  look_at: [0, 0, -300]
+  view_up: [0.0, 1.0, 0.0]
+  fov: 65
