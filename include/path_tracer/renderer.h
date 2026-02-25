@@ -26,14 +26,19 @@ private:
 			//this way we decide de surface side at geometry time
 		}
 
+		int object_type;
+
 	};
 
 public:
 
 	
-	hit_record closest_hit(const scene& scene, const ray& ray);
 	color trace_ray(const scene& scene, const ray& ray, int depth);
+
+	hit_record closest_hit(const scene& scene, const ray& ray);
 	hit_record hit_sphere(const sphere& sphere, const ray& ray);
+	
+	hit_record hit_triangle(const triangle& triangle, const ray& ray);
 
 	int m_num_bouces = 10;
 

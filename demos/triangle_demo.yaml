@@ -1,0 +1,156 @@
+materials:
+  matte_blue:
+    albedo: [0.1, 0.2, 0.5]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  ground_gray:
+    albedo: [0.9, 0.9, 0.9]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  mettalic_yellow:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 0.99
+    specular_probability: 0.99
+    specular_color: [0.9, 0.8, 0.4]
+
+  glossy_red:
+    albedo: [0.9, 0.2, 0.3]
+    smoothness: 0.99
+    specular_probability: 0.02
+
+  glossy_white:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 0.98
+    specular_probability: 0.2
+    specular_color: [1.0, 1.0, 1.0]
+
+  fuzzy_purple:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.70
+    specular_probability: 0.99
+    specular_color: [0.9, 0.6, 0.9]
+
+  soft_black:
+    albedo: [0.05, 0.05, 0.05]
+    smoothness: 0.50
+    specular_probability: 0.05
+    specular_color: [0.98, 0.98, 0.98]
+
+  emissive_warm:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.95, 0.1, 0.1]
+    emission_strength: 3.5  
+
+  emissive_cold:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.1, 0.1, 0.95]
+    emission_strength: 3.5
+
+  emissive_green:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.1, 0.95, 0.1]
+    emission_strength: 3.5
+
+  emissive_white:
+    albedo: [0.0, 0.0, 0.0]
+    specular_probability: 0.0
+    emission_color: [1.0, 1.0, 1.0]
+    emission_strength: 2.5
+
+
+world:
+  - type: sphere
+    center: [0, -100.5, -1]
+    radius: 100
+    material: "ground_gray"
+
+  - type: sphere
+    center: [0, 0, -0.4]
+    radius: 0.5
+    material: "glossy_red"
+
+  - type: sphere
+    center: [2.5, -0.04, -0.2]
+    radius: 0.5
+    material: "matte_blue"
+
+  - type: sphere
+    center: [-3, 0.06, -1]
+    radius: 0.6
+    material: "fuzzy_purple"
+
+  - type: sphere
+    center: [-1.5, 0.20, -3.5]
+    radius: 0.7
+    material: "mettalic_yellow"
+
+  - type: sphere
+    center: [2.0, 0.15, -3.7]
+    radius: 0.7
+    material: "glossy_white"
+
+  - type: sphere
+    center: [4.5, 0.1, -1.5]
+    radius: 0.7
+    material: "soft_black"
+
+
+
+  - type: triangle 
+    v0: [2.0, 0.15, -3.7]
+    v1:  [0, 0, -0.4]
+    v2: [2.5, 0.04, -0.2]
+    material: "fuzzy_purple"
+
+  - type: triangle 
+    v0: [2.0, 0.15, -3.7]
+    v1:  [4.5, 0.1, -1.5]
+    v2: [2.5, 0.04, -0.2]
+    material: "emissive_cold"
+
+  - type: triangle 
+    v0: [2.0, 0.15, -3.7]
+    v1:  [0, 0, -0.4]
+    v2: [-1.5, 0.20, -3.5]
+    material: "mettalic_yellow"
+
+  - type: triangle 
+    v0: [-1.5, 0.20, -3.5]
+    v1:  [-3, 0.06, -1]
+    v2: [0, 0, -0.4]
+    material: "glossy_red"
+
+
+
+  - type: sphere
+    center: [2, 3, -3]
+    radius: 0.5
+    material: "emissive_white"
+
+  - type: sphere
+    center: [-2, 3, -3]
+    radius: 0.5
+    material: "emissive_white"
+
+  - type: sphere
+    center: [0, 3, -3]
+    radius: 0.5
+    material: "emissive_white"
+
+
+
+ambient_light_strength: 0.04
+
+camera:
+  look_from: [-1.0, 5.2, 2.3]
+  look_at: [0, 0, -2.5]
+  view_up: [0.0, 1.0, 0.0]
+  fov: 65 

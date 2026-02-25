@@ -39,6 +39,7 @@ public:
 	void build_world(scene& world) {
 		parse_material();
 		parse_spheres(world);
+		parse_triangles(world);
 		parse_ambient_light(world);
 	};
 
@@ -78,14 +79,46 @@ private:
 		auto world_node = m_scene_file["world"];
 
 		for (auto object: world_node) {
-			point3 center = object["center"].as<vec3>();
-			double radius = object["radius"].as<double>();
+			std::string type = object["type"].as<std::string>();
+			if(type == "sphere") {
+				std::cerr << "parse sphere" << std::endl;
+				point3 center = object["center"].as<vec3>();
+				double radius = object["radius"].as<double>();
 
-			material mat;
-			auto mat_name = object["material"].as<std::string>();
-			mat = m_material_lib[mat_name];
+				material mat;
+				auto mat_name = object["material"].as<std::string>();
+				mat = m_material_lib[mat_name];
 
-			world.spheres.push_back(sphere(center, radius, mat));
+				world.spheres.push_back(sphere(center, radius, mat));
+			}
+
+		}
+	}
+
+	void parse_triangles(scene& world) {
+		auto world_node = m_scene_file["world"];
+
+		for (auto object: world_node) {
+			std::string type = object["type"].as<std::string>();
+			if(type == "triangle") {
+				std::cerr << "parse triangle" << std::endl;
+				point3 v0 = object["v0"].as<vec3>();
+				point3 v1 = object["v1"].as<vec3>();
+				point3 v2 = object["v2"].as<vec3>();
+
+				material mat;
+				auto mat_name = object["material"].as<std::string>();
+				mat = m_material_lib[mat_name];
+
+				triangle triangle;
+				triangle.vertices[0] = v0;
+				triangle.vertices[1] = v1;
+				triangle.vertices[2] = v2;
+
+				triangle.mat = mat;
+
+				world.triangles.push_back(triangle);
+			}
 		}
 	}
 

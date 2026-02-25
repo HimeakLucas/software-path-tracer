@@ -1,5 +1,11 @@
 #include "path_tracer/renderer.h"
+#include "path_tracer/color.h"
 #include "path_tracer/vec3.h"
+#include <cmath>
+#include <cstddef>
+#include <vector>
+#include <thread>
+#include <atomic>
 
 void Renderer::render(const scene& scene, const camera& camera) {
 	
@@ -10,21 +16,77 @@ void Renderer::render(const scene& scene, const camera& camera) {
 	int max_depth = camera.max_depth;
 
 	std::cout << "P3\n" << width << ' ' << height << "\n255\n";
+	
+	size_t total_pixels = static_cast<size_t>(width) * static_cast<size_t>(height); //casting to size_t for safety
 
-	for(int j = 0; j < height; j++) {
-		std::clog << "\rScanLines remaining: " << (height - j) << ' ' << std::flush;
-		for(int i = 0; i < width; i++){
-			color pixel_color(0, 0, 0);
+	std::vector<color> frame_buffer(total_pixels, color{0, 0, 0});
+
+	unsigned int thread_count = std::thread::hardware_concurrency();
+
+	std::atomic<int> next_row = 0; ////basicaly thread safe ints to be accesed from various threads at the same time
+	std::atomic<int> rows_done = 0;
+
+	std::vector<std::thread> workers;
+	workers.reserve(thread_count);
+
+	for (unsigned int tid = 0; tid < thread_count; tid++){
+		workers.push_back(std::thread([&, tid](){
 			
-			for(int sample = 0; sample < samples_per_pixel; sample++) {
-				ray r = camera.get_ray(i, j);
-				pixel_color += trace_ray(scene, r, max_depth);
+			while (true) {
+				int j = next_row.fetch_add(1);
+				if (j >= height) break;
+
+				for(int i = 0; i < width; i++){
+					color pixel_color(0, 0, 0);
+
+					for(int sample = 0; sample < samples_per_pixel; sample++) {
+						ray r = camera.get_ray(i, j);
+						pixel_color += trace_ray(scene, r, max_depth);
+					}
+
+					size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
+					frame_buffer[pixel_idx] = pixel_samples_scale * pixel_color;
+				}
+
+				rows_done.fetch_add(1);
+
 			}
 
-			write_color(std::cout, pixel_samples_scale * pixel_color);
+		}));
+	}
+
+	while (rows_done.load() < height) {
+	 	std::clog << "\rScanLines remaining: " << (height - rows_done.load()) << ' ' << std::flush;
+		std::this_thread::sleep_for(std::chrono::milliseconds(150));
+	}
+
+	for (auto &t: workers) if (t.joinable()) t.join();
+
+	std::clog << "\rDone                                   \n";
+
+	for(int j = 0; j < height; j++) {
+		for(int i = 0; i < width; i++) {
+			size_t pixel_idx = (static_cast<size_t>(width) * j) +  i;
+			write_color(std::cout, frame_buffer[pixel_idx]);
 		}
 	}
-	std::clog << "\rDone                                   \n";
+
+	
+
+	// for(int j = 0; j < height; j++) {
+	// 	std::clog << "\rScanLines remaining: " << (height - j) << ' ' << std::flush;
+	// 	for(int i = 0; i < width; i++){
+	// 		color pixel_color(0, 0, 0);
+	//
+	// 		for(int sample = 0; sample < samples_per_pixel; sample++) {
+	// 			ray r = camera.get_ray(i, j);
+	// 			pixel_color += trace_ray(scene, r, max_depth);
+	// 		}
+	//
+	// 		write_color(std::cout, pixel_samples_scale * pixel_color);
+	// 	}
+	// }
+	// std::clog << "\rDone                                   \n";
 };
 
 color Renderer::trace_ray(const scene& scene, const ray& r, int depth) {
@@ -101,6 +163,20 @@ Renderer::hit_record Renderer::closest_hit(const scene& scene, const ray& r) {
 			}
 		}
 	}
+
+	for (const auto& triangle : scene.triangles) {
+
+		hit_record triangle_rec = Renderer::hit_triangle(triangle, r);
+
+		if (triangle_rec.hit_something) {
+			triangle_rec.hit_something = true;
+			if (triangle_rec.distance < closest_so_far) {
+				scene_rec = triangle_rec;
+				closest_so_far = scene_rec.distance;
+			}
+		}
+	}
+
 	return scene_rec;
 };
 			
@@ -137,5 +213,80 @@ Renderer::hit_record Renderer::hit_sphere(const sphere& sphere, const ray& r) {
 	rec.set_face_normal(r, outward_normal);
 
 	
+	return rec;
+}
+
+
+Renderer::hit_record Renderer::hit_triangle(const triangle& triangle, const ray& r) {
+	hit_record rec;
+	rec.hit_something = false;
+
+	//       C-v2
+	//	  /\
+	//	 /  \
+	//	/  P \
+	//     /______\
+	//   A-v0    B-v1
+
+	// https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+	// ray-triangle intersection: O - A = -tD + uAB + vAC
+	//
+	// M = [-D, AB, AC]
+	// T = O - A
+	// X = [t, u, v]
+	//
+	// MX = T
+	//
+	// Cramer's Rule:
+	// [t, u, v]  = 1 / det(M) * [det[mt]. det[mu], det[mv]]
+	//
+	// det(M)  = (D x AC) * AB
+	// det(Mt) = (T x AB) * AC
+	// det(Mu) = (D x AC) * T
+	// det(Mv) = (T x AB) * D
+	//
+	// P = D x AC;  Q = T x AB
+	//
+	// [t, u, v]  = 1 / (P * AC) * [Q * AC, P * T, Q * D]
+	
+	const double EPS = 1e-8;
+
+	point3 A = triangle.vertices[0];
+	point3 B = triangle.vertices[1];
+	point3 C = triangle.vertices[2];
+
+	vec3 AB = B - A;
+	vec3 AC = C - A;
+
+
+	vec3 D = r.direction();
+	vec3 P = cross(D, AC);
+	double det = (dot(P, AB));
+	if (std::fabs(det) <= EPS) return rec;
+
+	double inv_det = 1 / det;
+
+	vec3 T = r.origin() - A;
+	double u = inv_det * dot(P, T);
+	if(u < EPS || u > 1 + EPS) return rec;
+
+	vec3 Q = cross(T, AB);
+	double v = inv_det * dot(Q, D);
+	if(v < EPS || v > 1 + EPS)  return rec;
+
+	if(u + v >= 1 + EPS) return rec;
+
+	double t = inv_det * dot(Q, AC);
+	if(t <= EPS) return rec;
+
+
+	vec3 normal = unit_vector(cross(AB, AC));	
+
+	rec.hit_something = true;
+	rec.distance = t;
+	rec.hit_point = r.at(t);
+	rec.mat = triangle.mat;
+	rec.set_face_normal(r, normal);
+
 	return rec;
 }
