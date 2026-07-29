@@ -198,3 +198,4 @@ camera:
   look_at: [50, 0, -300]
   view_up: [0.0, 1.0, 0.0]
   fov: 65
+  aspect_ratio: 1

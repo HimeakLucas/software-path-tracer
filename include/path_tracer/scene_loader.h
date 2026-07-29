@@ -167,6 +167,7 @@ private:
 		cam.look_at = cam_node["look_at"].as<vec3>(vec3(0, 0, -1));
 		cam.vfov = cam_node["fov"].as<double>(65.0);
 		cam.vup = cam_node["view_up"].as<vec3>(vec3(0, 1, 0));
+		cam.aspect_ratio = cam_node["aspect_ratio"].as<double>(16.0/9.0);
 	}
 };
 
