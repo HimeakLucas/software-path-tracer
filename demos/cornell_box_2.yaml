@@ -1,0 +1,200 @@
+materials:
+  matte_blue:
+    albedo: [0.1, 0.2, 0.5]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  matte_green:
+    albedo: [0.1, 0.6, 0.1]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  matte_red:
+    albedo: [0.6, 0.1, 0.1]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  ground_gray:
+    albedo: [0.9, 0.9, 0.9]
+    smoothness: 0.5
+    specular_probability: 0.02
+
+  emissive_white:
+    albedo: [0.0, 0.0, 0.0]
+    specular_probability: 0.0
+    emission_color: [1.0, 1.0, 1.0]
+    emission_strength: 7.5
+
+  mirror:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 1.00
+    specular_probability: 1.0
+    specular_color: [0.9, 0.9, 0.9]
+
+  mettalic_yellow:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 0.99
+    specular_probability: 0.99
+    specular_color: [0.9, 0.8, 0.4]
+
+  glossy_red:
+    albedo: [0.9, 0.2, 0.3]
+    smoothness: 0.99
+    specular_probability: 0.02
+
+  glossy_white:
+    albedo: [1.0, 1.0, 1.0]
+    smoothness: 0.98
+    specular_probability: 0.02
+    specular_color: [1.0, 1.0, 1.0]
+
+  fuzzy_purple:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.70
+    specular_probability: 0.99
+    specular_color: [0.9, 0.6, 0.9]
+
+  soft_black:
+    albedo: [0.05, 0.05, 0.05]
+    smoothness: 0.50
+    specular_probability: 0.05
+    specular_color: [0.98, 0.98, 0.98]
+
+  emissive_warm:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.95, 0.1, 0.1]
+    emission_strength: 1.0  
+
+  emissive_cold:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.1, 0.1, 0.95]
+    emission_strength: 1.0
+
+  emissive_green:
+    albedo: [0.0, 0.0, 0.0]
+    smoothness: 0.0
+    specular_probability: 0.0
+    emission_color: [0.1, 0.95, 0.1]
+    emission_strength: 1.0
+
+
+box_size:
+  size: &size  300
+  n_size: &n_size  -300
+
+world:
+
+#UP FACE
+  - type: quad
+    v0: [*n_size, *size, *n_size]
+    v1: [*n_size, *size, *size]
+    v2: [*size,   *size, *size]
+    v3: [*size,   *size, *n_size]
+    material: "ground_gray"
+
+#BOTTON FACE
+  - type: quad
+    v0: [*n_size, *n_size, *n_size]
+    v1: [*n_size, *n_size, *size]
+    v2: [*size,   *n_size, *size]
+    v3: [*size,   *n_size, *n_size]
+    material: "ground_gray"
+
+#RIGHT FACE
+  - type: quad
+    v0: [*size, *size, *n_size]
+    v1: [*size, *size, *size]
+    v2: [*size, *n_size, *size]
+    v3: [*size, *n_size, *n_size]
+    material: "matte_red"
+
+#LEFT FACE
+  - type: quad
+    v0: [*n_size, *size, *n_size]
+    v1: [*n_size, *size, *size]
+    v2: [*n_size, *n_size, *size]
+    v3: [*n_size, *n_size, *n_size]
+    material: "matte_green"
+
+#BACK FACE
+  - type: quad
+    v0: [*size, *n_size,  *n_size]
+    v1: [*size, *size,  *n_size]
+    v2: [*n_size, *size,*n_size]
+    v3: [*n_size, *n_size,*n_size]
+    material: "ground_gray"
+
+#LAMP
+  - type: triangle 
+    v0: [-100, 299, 100]
+    v1: [100,  299, 100]
+    v2: [-100, 299, -100]
+    material: "emissive_white"
+
+  - type: triangle 
+    v0: [100,  299, -100]
+    v1: [100,  299, 100]
+    v2: [-100, 299, -100]
+    material: "emissive_white"
+
+#RIGHT mirror
+  - type: quad
+    v0: [299, 000, -000]
+    v1: [299, 000, 200]
+    v2: [299, -300, 200]
+    v3: [299, -300, -000]
+    material: "mirror"
+
+#SPHERES
+  - type: sphere
+    center: [-150, -150, -150]
+    radius: 150
+    material: "glossy_white"
+
+  - type: sphere
+    center: [120, -230, -150]
+    radius: 70
+    material: "glossy_red"
+
+  - type: sphere
+    center: [150, -260, 200]
+    radius: 40
+    material: "soft_black"
+
+  - type: sphere
+    center: [-0, -260, 100]
+    radius: 40
+    material: "mettalic_yellow"
+
+  - type: sphere
+    center: [230, -260, -130]
+    radius: 40
+    material: "fuzzy_purple"
+
+
+  - type: sphere
+    center: [-260, -260, 0]
+    radius: 40
+    material: "emissive_cold"
+
+  - type: sphere
+    center: [-150, -270, 0]
+    radius: 30
+    material: "emissive_warm"
+
+  - type: sphere
+    center: [-200, -280, 100]
+    radius: 20
+    material: "emissive_green"
+
+ambient_light_strength: 0.1
+
+camera:
+  look_from: [-150.0, 000.0, 850]
+  look_at: [50, 0, -300]
+  view_up: [0.0, 1.0, 0.0]
+  fov: 65

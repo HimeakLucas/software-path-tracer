@@ -40,6 +40,7 @@ public:
 		parse_material();
 		parse_spheres(world);
 		parse_triangles(world);
+		parse_quads(world);
 		parse_ambient_light(world);
 	};
 
@@ -118,6 +119,39 @@ private:
 				triangle.mat = mat;
 
 				world.triangles.push_back(triangle);
+			}
+		}
+	}
+	void parse_quads(scene& world) {
+		auto world_node = m_scene_file["world"];
+
+		for (auto object: world_node) {
+			std::string type = object["type"].as<std::string>();
+			if(type == "quad") {
+				std::cerr << "parse quad" << std::endl;
+				
+				point3 v0 = object["v0"].as<vec3>();
+				point3 v1 = object["v1"].as<vec3>();
+				point3 v2 = object["v2"].as<vec3>();
+				point3 v3 = object["v3"].as<vec3>();
+
+				material mat;
+				auto mat_name = object["material"].as<std::string>();
+				mat = m_material_lib[mat_name];
+
+				triangle triangle1;
+				triangle1.vertices[0] = v0;
+				triangle1.vertices[1] = v1;
+				triangle1.vertices[2] = v2;
+				triangle1.mat = mat;
+				world.triangles.push_back(triangle1);
+
+				triangle triangle2;
+				triangle2.vertices[0] = v0;
+				triangle2.vertices[1] = v2;
+				triangle2.vertices[2] = v3;
+				triangle2.mat = mat;
+				world.triangles.push_back(triangle2);
 			}
 		}
 	}
